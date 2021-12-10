@@ -1,3 +1,4 @@
+---
 kind: repo_file
 spec:
     category: security
@@ -15,4 +16,3 @@ spec:
     notes: ""
     # uncomment if you want to apply a check owner
     # owner: sre_team
-

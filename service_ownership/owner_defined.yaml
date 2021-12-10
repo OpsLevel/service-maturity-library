@@ -1,3 +1,4 @@
+---
 kind: has_owner
 spec:
     category: quality
@@ -9,4 +10,3 @@ spec:
     notes: All services need ownership; it helps ensure authority, autonomy, and accountability.
     # uncomment if you want to apply a check owner
     # owner: sre_team
-
