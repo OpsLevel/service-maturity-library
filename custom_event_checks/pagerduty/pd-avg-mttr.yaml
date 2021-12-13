@@ -1,0 +1,40 @@
+---
+kind: generic
+spec:
+    category: reliability
+    enabled: true
+    # uncomment if you want to apply a filter
+    # filter: ruby-services
+    integration: generic-pagerduty-analytics-api
+    level: gold
+    message: |
+        {% if check.passed %}
+          ### Check passed
+        {% else %}
+          ### Check failed
+        {% endif %}
+
+        {% assign start_date = data.filters.created_at_start | date: '%s' %}
+        {% assign end_date = data.filters.created_at_end | date: '%s' %}
+        {% assign num_days = end_date | minus: start_date | divided_by: 86400 %}
+
+        {% if data.data.first %}
+          {% assign mttr_seconds = data.data.first.mean_seconds_to_resolve %}
+          {% assign mttr_minutes = mttr_seconds | divided_by: 60 %}
+          {% assign mttr_hours = mttr_minutes | divided_by: 60 %}
+          On average, over the **last {{num_days}} days**, it takes **{{mttr_minutes}} minutes** ({{mttr_hours}} hours) to resolve incidents on service **[{{data.ol_service_alias}}]({{data.html_url}})**.
+
+        {% else %}
+          The **[{{data.ol_service_alias}}]({{data.html_url}})** service does not seem to have experienced any incidents over the last {{num_days}} days.
+        {% endif %}
+
+        This is from data taken between {{start_date | date: "%Y-%m-%d"}} and {{end_date | date: "%Y-%m-%d"}}.
+    name: PagerDuty - MTTR < 2 hours
+    notes: |
+        ### Why is this check important?
+
+        We use PagerDuty for on-call and incident management.  We are trying to keep incident resolve time (MTTR) down to **below 2 hours** on average.
+    # uncomment if you want to apply a check owner
+    # owner: sre_team
+    serviceSelector: .ol_service_alias
+    successCondition: .data[0].mean_seconds_to_resolve <  3600*2
