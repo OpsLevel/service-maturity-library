@@ -1,7 +1,6 @@
 ---
 kind: repo_file
 spec:
-    category: security
     directorySearch: false
     enabled: true
     fileContentsPredicate:
@@ -9,10 +8,5 @@ spec:
         value: ' akkaVersion = "2.5'
     filePaths:
         - build.sbt
-    # uncomment if you want to apply a filter
-    # filter: tier-2-and-above
-    level: bronze
     name: Using Akka 2.5
     notes: ""
-    # uncomment if you want to apply a check owner
-    # owner: sre_team

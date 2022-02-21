@@ -2,8 +2,6 @@ kind: generic
 spec:
     category: reliability
     enabled: true
-    # uncomment if you want to apply a filter
-    # filter: tier-1-services
     integration: generic-pagerduty-ep-api
     level: silver
     message: |-
@@ -38,9 +36,6 @@ spec:
         1. You have a "Service" created in PagerDuty, and
         1. Your PD Service has an Escalation Policy with a "Schedule" on the very first escalation rule.  (I.e. in the first group that gets paged.)
 
-
-    # uncomment if you want to apply a check owner
-    # owner: sre_team
     serviceSelector: .escalation_policies[].services[].summary
     successCondition: .escalation_policies[] | select(.services| .[].summary == $ctx.alias) | .escalation_rules[0].targets[] | select(.type == "schedule_reference") | any
 

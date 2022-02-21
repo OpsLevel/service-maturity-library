@@ -3,8 +3,6 @@ kind: generic
 spec:
     category: reliability
     enabled: true
-    # uncomment if you want to apply a filter
-    # filter: ruby-services
     integration: generic-pagerduty-analytics-api
     level: gold
     message: |
@@ -34,7 +32,5 @@ spec:
         ### Why is this check important?
 
         We use PagerDuty for on-call and incident management.  We are trying to keep incident resolve time (MTTR) down to **below 2 hours** on average.
-    # uncomment if you want to apply a check owner
-    # owner: sre_team
     serviceSelector: .ol_service_alias
     successCondition: .data[0].mean_seconds_to_resolve <  3600*2

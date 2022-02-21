@@ -1,12 +1,7 @@
 ---
 kind: generic
 spec:
-    category: reliability
     enabled: false
-    # uncomment if you want to apply a filter
-    # filter: tier-1-services
-    integration: generic-pagerduty-services-api
-    level: gold
     message: |-
         {% if check.passed %}
           ### Check passed
@@ -16,7 +11,12 @@ spec:
         {% endif %}
     name: 'PagerDuty: No incidents in the last 7 days'
     notes: ""
-    # uncomment if you want to apply a check owner
-    # owner: sre_team
     serviceSelector: .services[] | .name
     successCondition: .services[]  | .last_incident_timestamp == null or (.last_incident_timestamp | fromdate < now - 7*24*3600)
+
+    # Optional
+    # category: reliability
+    # level: gold
+    # integration: generic-pagerduty-services-api
+    # filter: tier-1-services
+    # owner: sre_team
