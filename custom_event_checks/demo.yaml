@@ -1,7 +1,7 @@
 ---
+version: 1
 kind: generic
 spec:
-    enabled: false
     message: |-
         {% if check.passed %}
           ### Check passed
