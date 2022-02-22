@@ -40,4 +40,3 @@ spec:
 
     serviceSelector: .escalation_policies[].services[].summary
     successCondition: .escalation_policies[] | select(.services| .[].summary == $ctx.alias) | .escalation_rules[0].targets[] | select(.type == "schedule_reference") | any
-
