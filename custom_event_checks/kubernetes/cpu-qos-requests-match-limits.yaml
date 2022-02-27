@@ -1,0 +1,56 @@
+---
+version: 1
+kind: generic
+spec:
+    category: reliability
+    enabled: true
+    level: gold
+    message: |-
+      {% if check.failed %}  
+        ### Check failed  
+        Deployment `{{ data.metadata.namespace }}/{{ data.metadata.name }}` is a Tier 1 Service that does not specify matching CPUs for requests & limits.
+
+        It currently uses:
+        {%- if data.spec.template.spec contains "initContainers" %}
+          {%- assign containers = data.spec.template.spec.initContainers %}
+          {%- for container in containers %}
+
+            #### Init Container: `{{ container.name }}`
+            ```
+            {{ container.resources | jsonify }}
+            ```
+
+          {%- endfor %}
+        {%- endif %}
+
+        {%- if data.spec.template.spec contains "containers" %}
+          {%- assign containers = data.spec.template.spec.containers %}
+          {%- for container in containers %}
+            #### Container: `{{ container.name }}`
+            ```
+            {{ container.resources | jsonify }}
+            ```
+          {%- endfor %}
+        {%- endif %}
+
+        This means you are not being given the highest level of CPU Quality of Service by Kubernetes.
+
+        Please change any CPU requests and limits value to match.
+
+        You can read more about Kubernetes [CPU Policies Here](https://kubernetes.io/docs/tasks/administer-cluster/cpu-management-policies/#cpu-management-policies)
+      {% else %}
+        ### Check Passed
+      {% endif %}
+    name: All services have matching requests & limits for CPU to get best Quality of Service
+    notes: |+
+        ### Why is this check important?
+
+        Kubernetes allows for specifying less CPU requests then limits to allow for workloads to burst their CPU usage when needed.  The downside to this mode is that CPU cycles are still shared between pods.
+        In business critical workloads we recommend that you obtain a higher CPU quality of service by ensuring that your requests and limits are equal.
+
+        ### What do I need to do?
+
+        1. All Deployment resources for your service have matching CPU for requests & limits
+
+    serviceSelector: '"k8s:\(.metadata.name)-\(.metadata.namespace)"'
+    successCondition: '.spec.template.spec | [((select(.initContainers != null) | .initContainers | .[].resources), (select(.containers != null) | .containers | .[].resources))] | map({requests: .requests.cpu, limits: .limits.cpu}) | map((.requests |   if contains("m") then .[0:length-1] | tonumber / 1000 else . | tonumber end) == (.limits | if contains("m") then .[0:length-1] | tonumber / 1000 else . | tonumber end)) | all(.)'

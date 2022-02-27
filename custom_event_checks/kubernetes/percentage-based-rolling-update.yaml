@@ -1,0 +1,30 @@
+---
+version: 1
+kind: generic
+spec:
+    category: reliability
+    enabled: true
+    level: bronze
+    message: |-
+        {% if check.passed %}
+          ### Check passed
+          Service **{{ ctx.alias }}** uses percentage based rolling updates.
+
+        {% else %}
+          ### Check failed
+          Service **{{ ctx.alias }}** has a Kubernetes manifest that does not use percentage based rolling updates.
+
+        {% endif %}
+    name: All services use percentage based rolling update strategy
+    notes: |+
+        ### Why is this check important?
+
+        Kubernetes allows rolling update strategies to be define in raw pod counts or in percentages of current pod counts.  To ensure a safe and reliable rollout no matter how many pods your service may have scaled to
+        its best practice to use percentage based rolling update strategy to ensure a timely rolling update.
+
+        ### What do I need to do?
+
+        1. All Deployment resources for your service must use percentages for `maxSurge` and `maxUnavailable` in `spec.strategy.rollingUpdate`
+
+    serviceSelector: '"k8s:\(.metadata.name)-\(.metadata.namespace)"'
+    successCondition: 'if (.spec.strategy.type == "RollingUpdate") then (.spec.strategy.rollingUpdate | (.maxSurge | tostring | contains("%")) or (.maxUnavailable | tostring | contains("%"))) else false end'
