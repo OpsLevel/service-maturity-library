@@ -1,0 +1,46 @@
+---
+version: 1
+kind: generic
+spec:
+    category: security
+    enabled: true
+    level: bronze
+    message: |-
+        {% if check.passed %}
+          ### Check passed
+          Service **{{ ctx.alias }}** uses all trusted container images.
+
+        {% else %}
+          ### Check failed
+          Service **{{ ctx.alias }}** uses one or more untrusted container images.
+
+          Images In Use Are:
+          {%- if data.spec.template.spec contains "initContainers" %}
+            {%- assign containers = data.spec.template.spec.initContainers %}
+            {%- for container in containers %}
+              #### Init Container: `{{ container.name }}`
+              {{ container.image | jsonify }}
+            {%- endfor %}
+          {%- endif %}
+
+          {%- if data.spec.template.spec contains "containers" %}
+            {%- assign containers = data.spec.template.spec.containers %}
+            {%- for container in containers %}
+              #### Container: `{{ container.name }}`
+              {{ container.image | jsonify }}
+            {%- endfor %}
+          {%- endif %}
+
+        {% endif %}
+    name: All services use containers from trusted registries
+    notes: |+
+        ### Why is this check important?
+
+        To ensure the software we run in our clusters we want all container images used come from the approved and trusted container registries
+
+        ### What do I need to do?
+
+        1. All container images in your services Kubernetes manifests use containers from gcr.io
+
+    serviceSelector: '"k8s:\(.metadata.name)-\(.metadata.namespace)"'
+    successCondition: '[((.spec.template.spec.initContainers[] | .image), (.spec.template.spec.containers[] | .image)) ] | map(.| contains("gcr.io") or contains("public.ecr.aws")) | all(.)'
