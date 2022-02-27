@@ -29,6 +29,5 @@ We have also setup a [helm-chart](https://github.com/OpsLevel/helm-charts) to ma
 ```yaml
 collector:
   enabled: true
-  integrations:
-  - https://app.opslevel.com/integrations/custom_event/eeb1f18e-7205-41a5-97fe-60a0657f062d
+  integrations: "https://app.opslevel.com/integrations/custom_event/eeb1f18e-7205-41a5-97fe-60a0657f062d"
 ```
